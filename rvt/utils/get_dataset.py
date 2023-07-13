@@ -88,7 +88,7 @@ def get_dataset(
                 print(f"remove {test_replay_storage_folder}")
 
         # print("----- Train Buffer -----")
-        fill_replay(
+        episode_idx = fill_replay(
             replay=train_replay_buffer,
             task=task,
             task_replay_storage_folder=train_replay_storage_folder,
@@ -110,7 +110,7 @@ def get_dataset(
 
         if not only_train:
             # print("----- Test Buffer -----")
-            fill_replay(
+            episode_idx = fill_replay(
                 replay=test_replay_buffer,
                 task=task,
                 task_replay_storage_folder=test_replay_storage_folder,
@@ -153,4 +153,4 @@ def get_dataset(
             num_workers=num_workers,
         )
         test_dataset = test_wrapped_replay.dataset()
-    return train_dataset, test_dataset
+    return train_dataset, test_dataset, episode_idx

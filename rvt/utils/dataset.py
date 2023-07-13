@@ -413,6 +413,8 @@ def fill_replay(
                     device=device,
                 )
 
+                return d_idx
+
         # save TERMINAL info in replay_info.npy
         task_idx = replay._task_index[task]
         with open(

@@ -13,7 +13,7 @@ import numpy as np
 from mvt.mvt_single import MVT as MVTSingle
 from mvt.config import get_cfg_defaults
 from mvt.renderer import BoxRenderer
-from save_virtual_image import save_virtual
+from mvt.save_virtual_image import save_virtual
 
 
 class MVT(nn.Module):
@@ -44,6 +44,8 @@ class MVT(nn.Module):
         add_depth,
         pe_fix,
         renderer_device="cuda:0",
+        task_name="temp",
+        episode_num="0",
     ):
         """MultiView Transfomer"""
         super().__init__()
@@ -74,7 +76,12 @@ class MVT(nn.Module):
         self.proprio_dim = proprio_dim
         self.img_size = img_size
 
+        self.task = task_name
+        self.episode = episode_num
+
         self.mvt1 = MVTSingle(**args, renderer=self.renderer)
+
+
 
     def get_pt_loc_on_img(self, pt, dyn_cam_info, out=None):
         """
@@ -172,7 +179,7 @@ class MVT(nn.Module):
             # img4.show()
             img5 = transform(tmp5)
             # img5.show()
-            save_virtual(img1, img2, img3, img4, img5)
+            save_virtual(img1, img2, img3, img4, img5, self.episode, self.task)
 
             # image augmentation
             if img_aug != 0:

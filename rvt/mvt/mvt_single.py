@@ -51,6 +51,8 @@ class MVT(nn.Module):
         pe_fix,
         renderer_device="cuda:0",
         renderer=None,
+        task_name='temp',
+        episode_num='0',
     ):
         """MultiView Transfomer
 
@@ -103,6 +105,8 @@ class MVT(nn.Module):
         self.add_pixel_loc = add_pixel_loc
         self.add_depth = add_depth
         self.pe_fix = pe_fix
+        self.task_ = task_name
+        self.episode = episode_num
 
         print(f"MVT Vars: {vars(self)}")
 
