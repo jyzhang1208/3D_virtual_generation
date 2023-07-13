@@ -3,6 +3,7 @@
 # Licensed under the NVIDIA Source Code License [see LICENSE for details].
 
 from math import ceil
+from PIL import Image
 
 import torch
 import torch.nn.functional as F
@@ -299,8 +300,11 @@ class MVT(nn.Module):
         :param lang_emb: tensor of shape (bs, lang_len, lang_dim)
         :param img_aug: (float) magnitude of augmentation in rgb image
         """
-
+        # pic = Image.fromarray(img[0][0].reshape(128, 128, 3), "RGB")
+        # pic.show()
         bs, num_img, img_feat_dim, h, w = img.shape
+        # print("222!")
+        # print(img.shape)
         num_pat_img = h // self.img_patch_size
         assert num_img == self.num_img
         # assert img_feat_dim == self.img_feat_dim

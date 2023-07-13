@@ -576,7 +576,7 @@ class RVTAgent:
             lang_emb=lang_goal_embs,
             img_aug=img_aug,
         )
-
+        """
         q_trans, rot_q, grip_q, collision_q, y_q, pts = self.get_q(
             out, dims=(bs, nc, h, w)
         )
@@ -661,7 +661,7 @@ class RVTAgent:
             }
             manage_loss_log(self, loss_log, reset_log=reset_log)
             return_out.update(loss_log)
-
+        
         if eval_log:
             with torch.no_grad():
                 wpt = torch.cat([x.unsqueeze(0) for x in wpt])
@@ -688,8 +688,8 @@ class RVTAgent:
                     collision_q=collision_q,
                     reset_log=reset_log,
                 )
-
-                return_out.update(return_log)
+                
+                return_out.update(return_log)"""
 
         return return_out
 

@@ -59,27 +59,27 @@ ddp:
 rlbench:
   task_name: multi
   tasks:
-  - change_channel
+#  - change_channel
   - close_jar
   - insert_onto_square_peg
   - light_bulb_in
   - meat_off_grill
   - open_drawer
-  - place_cups
-  - place_shape_in_shape_sorter
-  - push_buttons
-  - put_groceries_in_cupboard
-  - put_item_in_drawer
-  - put_money_in_safe
-  - reach_and_drag
-  - stack_blocks
-  - stack_cups
-  - turn_tap
-  - set_clock_to_time
-  - place_wine_at_rack_location
-  - put_rubbish_in_color_bin
-  - slide_block_to_color_target
-  - sweep_to_dustpan_of_size
+#  - place_cups
+#  - place_shape_in_shape_sorter
+#  - push_buttons
+#  - put_groceries_in_cupboard
+#  - put_item_in_drawer
+#  - put_money_in_safe
+#  - reach_and_drag
+#  - stack_blocks
+#  - stack_cups
+#  - turn_tap
+#  - set_clock_to_time
+#  - place_wine_at_rack_location
+#  - put_rubbish_in_color_bin
+#  - slide_block_to_color_target
+#  - sweep_to_dustpan_of_size
   demos: 100
   demo_path: /raid/dataset/
   episode_length: 25

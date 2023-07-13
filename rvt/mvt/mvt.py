@@ -8,10 +8,12 @@ import torch
 from torch import nn
 
 import mvt.utils as mvt_utils
+import numpy as np
 
 from mvt.mvt_single import MVT as MVTSingle
 from mvt.config import get_cfg_defaults
 from mvt.renderer import BoxRenderer
+from save_virtual_image import save_virtual
 
 
 class MVT(nn.Module):
@@ -88,6 +90,8 @@ class MVT(nn.Module):
         assert x == 3
         assert out is None
         out = self.mvt1.get_pt_loc_on_img(pt, dyn_cam_info)
+        # pring("999")
+        # print(out.shape)
 
         return out
 
@@ -138,6 +142,7 @@ class MVT(nn.Module):
                     )
                 ]
 
+            # print(np.array(img).shape)
             img = torch.cat(img, 0)
             img = img.permute(0, 1, 4, 2, 3)
 
@@ -146,6 +151,28 @@ class MVT(nn.Module):
                 mvt.img = img[:, :, 3:].clone().detach()
             else:
                 mvt.img = img.clone().detach()
+            print(img.shape)
+            print(img[0][0][:3].shape)
+
+            import torchvision.transforms as T
+            tmp1 = img[0][0][3:6]
+            tmp2 = img[0][1][3:6]
+            tmp3 = img[0][2][3:6]
+            tmp4 = img[0][3][3:6]
+            tmp5 = img[0][4][3:6]
+            # print(tmp[5][0])
+            transform = T.ToPILImage()
+            img1 = transform(tmp1) # over_rgb, keep the same
+            # img1.show()
+            img2 = transform(tmp2)
+            # img2.show()
+            img3 = transform(tmp3)
+            # img3.show()
+            img4 = transform(tmp4)
+            # img4.show()
+            img5 = transform(tmp5)
+            # img5.show()
+            save_virtual(img1, img2, img3, img4, img5)
 
             # image augmentation
             if img_aug != 0:
@@ -234,8 +261,10 @@ class MVT(nn.Module):
             img_aug,
             dyn_cam_info=None,
         )
-        out = self.mvt1(img=img, proprio=proprio, lang_emb=lang_emb, **kwargs)
-        return out
+        # print(img.shape)
+        # out = self.mvt1(img=img, proprio=proprio, lang_emb=lang_emb, **kwargs)
+        # print(out.shape)
+        return 0
 
     def free_mem(self):
         """

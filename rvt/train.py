@@ -8,9 +8,12 @@ import tqdm
 import random
 import yaml
 import argparse
+import sys
+sys.path.append('..')
 
 from collections import defaultdict
 from contextlib import redirect_stdout
+import torchvision.transforms as T
 
 import torch
 import torch.multiprocessing as mp
@@ -38,6 +41,9 @@ from rvt.utils.peract_utils import (
     IMAGE_SIZE,
     DATA_FOLDER,
 )
+from PIL import Image
+import cv2
+
 
 # new train takes the dataset as input
 def train(agent, dataset, training_iterations, rank=0):
@@ -57,11 +63,44 @@ def train(agent, dataset, training_iterations, rank=0):
             for k, v in raw_batch.items()
             if type(v) == torch.Tensor
         }
+        # import pdb;
+        # pdb.set_trace()
         batch["tasks"] = raw_batch["tasks"]
         batch["lang_goal"] = raw_batch["lang_goal"]
         update_args = {
             "step": iteration,
         }
+        # format: batch_size, 1, channel, pixel, pixel
+
+        # print(raw_batch['right_shoulder_rgb'].shape)
+        # print(raw_batch['right_shoulder_rgb'][0][0][1][2])
+        tmp = batch['right_shoulder_rgb'][0][0] / 255.0
+        # tmp[0], tmp[1], tmp[2] = tmp[2], tmp[1], tmp[0]
+        # tmp = tmp.cpu().numpy()
+        print("333")
+        transform = T.ToPILImage()
+        img = transform(tmp)
+        # img.show()
+        # print(tmp)
+        # tmp = tmp.permute(1, 2, 0)
+        # print(tmp[0])
+        # print(tmp[0].shape)
+        # for i in range(tmp.shape[0]):
+        #     for j in range(tmp.shape[1]):
+        #         tmp[i][j][0], tmp[i][j][1], tmp[i][j][2] = tmp[i][j][0], tmp[i][j][1], tmp[i][j][2]
+        # print(tmp.shape)
+        # tmp = tmp.cpu().numpy()
+        # pic = Image.fromarray(tmp,"RGB")
+        # pic.show()
+        # import pdb;pdb.set_trace()
+        # 将数组转换为RGB图像
+        # image = cv2.cvtColor(tmp.reshape(128, 128, 3), cv2.COLOR_BGR2RGB)
+
+        # 显示图像
+        # cv2.imshow('image', image)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
         update_args.update(
             {
                 "replay_sample": batch,
@@ -103,6 +142,8 @@ def get_tasks(exp_cfg):
     parsed_tasks = exp_cfg.tasks.split(",")
     if parsed_tasks[0] == "all":
         tasks = RLBENCH_TASKS
+        # import pdb;pdb.set_trace()
+        print("1111!", RLBENCH_TASKS)
     else:
         tasks = parsed_tasks
     return tasks
@@ -193,6 +234,7 @@ def experiment(rank, cmd_args, devices, port):
     train_dataset, _ = get_dataset_func()
     t_end = time.time()
     print("Created Dataset. Time Cost: {} minutes".format((t_end - t_start) / 60.0))
+    print(train_dataset)
 
     if exp_cfg.agent == "our":
         mvt_cfg = mvt_cfg_mod.get_cfg_defaults()
@@ -209,7 +251,7 @@ def experiment(rank, cmd_args, devices, port):
         rvt = MVT(
             renderer_device=device,
             **mvt_cfg,
-        ).to(device)
+        ).to(device) # multi-view transformer
         if ddp:
             rvt = DDP(rvt, device_ids=[device])
 

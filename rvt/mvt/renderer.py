@@ -448,6 +448,9 @@ class BoxRenderer:
                 if img.max() > 1:
                     assert img.max() < 1.001
                     img /= img.max()
+        # print("555")
+        # print(img.shape)
+        # img = [num_img, h, w, 7 channel]
         return img
 
     @torch.no_grad()
@@ -482,6 +485,8 @@ class BoxRenderer:
             renderer = self._get_fix_ren()
             fix_img = renderer(p3d_pc, with_depth=self.with_depth)
             fix_img = self.img_norm(fix_img)
+            # print("777")
+            # print(fix_img.shape)
             img.append(fix_img)
 
         if not dyn_cam_info is None:
@@ -494,9 +499,15 @@ class BoxRenderer:
             dyn_img = renderer(p3d_pc, with_depth=self.with_depth)
             dyn_img = self.img_norm(dyn_img)
             img.append(dyn_img)
+            # print("555")
+            # print(dyn_img.shape)
 
         # combining both the predictions
+        # print("666")
+        # import numpy as np
+        # print(img)
         img = torch.cat(img, 0)
+        # print(img.shape)
         return img
 
     @torch.no_grad()
@@ -538,6 +549,10 @@ class BoxRenderer:
             # (bs * np, num_img, 2)
             fix_pt_img = pt_scr - torch.tensor((1 / w, 1 / h)).to(pt_scr.device)
             fix_pt_img = fix_pt_img.view(bs, np, len(fix_cam), 2)
+            # import numpy as np
+            # print("888")
+            # tmp = fix_pt_img.cpu().numpy()
+            # print(tmp.shape)
             pt_img.append(fix_pt_img)
 
         if not dyn_cam_info is None:
@@ -564,6 +579,8 @@ class BoxRenderer:
             pt_img.append(dyn_pt_img)
 
         pt_img = torch.cat(pt_img, 2)
+        # print("8888")
+        # print(pt_img.shape)
 
         return pt_img
 

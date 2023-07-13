@@ -35,7 +35,7 @@ def get_pc_img_feat(obs, pcd, bounds=None):
     img_feat = torch.cat(
         [p.permute(0, 2, 3, 1).reshape(bs, -1, img_dim) for p in _img_feat], 1
     )
-
+    # print(img_feat.shape)
     img_feat = (img_feat + 1) / 2
 
     # x_min, y_min, z_min, x_max, y_max, z_max = bounds
@@ -226,7 +226,7 @@ def get_eval_parser():
 
     return parser
 
-
+'''
 RLBENCH_TASKS = [
     "put_item_in_drawer",
     "reach_and_drag",
@@ -247,7 +247,22 @@ RLBENCH_TASKS = [
     "meat_off_grill",
     "stack_cups",
 ]
+'''
 
+RLBENCH_TASKS = [
+    # "reach_and_drag",
+    # "slide_block_to_color_target",
+    "open_drawer",
+    # "put_groceries_in_cupboard",
+    # "place_shape_in_shape_sorter",
+    # "push_buttons",
+    # "close_jar",
+    # "place_wine_at_rack_location",
+    # "light_bulb_in",
+    # "insert_onto_square_peg",
+    # "meat_off_grill",
+    # "stack_cups",
+]
 
 def load_agent(agent_path, agent=None, only_epoch=False):
     if isinstance(agent, PreprocessAgent2):

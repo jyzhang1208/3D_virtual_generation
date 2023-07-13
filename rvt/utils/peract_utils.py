@@ -7,6 +7,9 @@ from omegaconf import OmegaConf
 
 from rvt.models.peract_official import create_agent_our
 from peract_colab.arm.utils import stack_on_channel
+from PIL import Image
+import matplotlib.pyplot as plt
+import numpy as np
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from rvt.utils.lr_sched_utils import GradualWarmupScheduler
 
@@ -44,12 +47,24 @@ def _preprocess_inputs(replay_sample, cameras):
         rgb = stack_on_channel(replay_sample["%s_rgb" % n])
         pcd = stack_on_channel(replay_sample["%s_point_cloud" % n])
 
+        # rgb_np = rgb.cpu().numpy()
+        # rgb_tmp2 = rgb_np.copy()
         rgb = _norm_rgb(rgb)
+        rgb_tmp = rgb.cpu().numpy()
+        pcd_tmp = pcd.cpu().numpy()
+        # pic = Image.fromarray(rgb_tmp[1].reshape(128,128,3),"RGB")
+        # pic.show()
+        # print(rgb_tmp[0][0][0])
+        rgb_tmp = np.clip(rgb_tmp, 0, 1) * 255
+        # plt.imshow(rgb_tmp[0].reshape(128,128,3))
+        # pic = Image.fromarray(rgb_tmp[0].reshape(128,128,3))
+        # pic.show()
 
         obs.append(
             [rgb, pcd]
         )  # obs contains both rgb and pointcloud (used in ARM for other baselines)
         pcds.append(pcd)  # only pointcloud
+        # print(rgb_tmp[0].shape)
     return obs, pcds
 
 

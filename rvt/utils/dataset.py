@@ -365,6 +365,7 @@ def fill_replay(
         for d_idx in range(start_idx, start_idx + num_demos):
             print("Filling demo %d" % d_idx)
             demo = get_stored_demo(data_path=data_path, index=d_idx)
+            # print(demo)
 
             # get language goal from disk
             varation_descs_pkl_file = os.path.join(
