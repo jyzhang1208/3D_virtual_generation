@@ -274,6 +274,8 @@ class PointsRendererWithDepth(nn.Module):
         # However, this could be done differently: e.g. predicted as opposed
         # to a function of the weights.
         r = self.rasterizer.raster_settings.radius
+        # print("333")
+        # print(point_clouds.features_packed().permute(1, 0).shape)
 
         dists2 = fragments.dists.permute(0, 3, 1, 2)
         weights = 1 - dists2 / (r * r)
@@ -482,6 +484,7 @@ class BoxRenderer:
         if fix_cam:
             p3d_pc = Pointclouds(points=pc, features=feat)
             p3d_pc = p3d_pc.extend(self.num_fix_cam)
+
             renderer = self._get_fix_ren()
             fix_img = renderer(p3d_pc, with_depth=self.with_depth)
             fix_img = self.img_norm(fix_img)

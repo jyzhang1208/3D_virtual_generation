@@ -252,11 +252,11 @@ RLBENCH_TASKS = [
 RLBENCH_TASKS = [
     # "reach_and_drag",
     # "slide_block_to_color_target",
-    "open_drawer",
+    # "open_drawer",
     # "put_groceries_in_cupboard",
     # "place_shape_in_shape_sorter",
     # "push_buttons",
-    # "close_jar",
+    "close_jar",
     # "place_wine_at_rack_location",
     # "light_bulb_in",
     # "insert_onto_square_peg",

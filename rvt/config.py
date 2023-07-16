@@ -30,7 +30,7 @@ _C.peract.warmup_steps = 0
 _C.peract.lr_cos_dec = False
 _C.peract.add_rgc_loss = True
 _C.peract.num_rotation_classes = 72
-_C.peract.transform_augmentation = True
+_C.peract.transform_augmentation = False
 _C.peract.transform_augmentation_xyz = [0.1, 0.1, 0.1]
 _C.peract.transform_augmentation_rpy = [0.0, 0.0, 20.0]
 

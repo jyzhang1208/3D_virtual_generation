@@ -53,6 +53,12 @@ class MVT(nn.Module):
         renderer=None,
         task_name='temp',
         episode_num='0',
+        total_lang="open",
+        total_action=None,
+        total_pose=None,
+        total_terminal=None,
+        total_reward=None,
+
     ):
         """MultiView Transfomer
 
@@ -107,6 +113,12 @@ class MVT(nn.Module):
         self.pe_fix = pe_fix
         self.task_ = task_name
         self.episode = episode_num
+        self.lang_goal = total_lang
+        self.action_set = total_action
+        self.pose_set = total_pose
+        self.reward_set = total_reward
+        self.terminal_set = total_terminal
+
 
         print(f"MVT Vars: {vars(self)}")
 

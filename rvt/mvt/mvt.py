@@ -44,14 +44,21 @@ class MVT(nn.Module):
         add_depth,
         pe_fix,
         renderer_device="cuda:0",
-        task_name="temp",
-        episode_num="0",
+        task_name = "temp",
+        episode_num = "0",
+        total_lang = "open",
+        total_action = None,
+        total_pose = None,
+        total_terminal=None,
+        total_reward=None,
     ):
         """MultiView Transfomer"""
         super().__init__()
 
         # creating a dictonary of all the input parameters
         args = copy.deepcopy(locals())
+        # print("000")
+        # print("args", args)
         del args["self"]
         del args["__class__"]
 
@@ -78,6 +85,16 @@ class MVT(nn.Module):
 
         self.task = task_name
         self.episode = episode_num
+        self.pre_episode = episode_num
+        self.frame_num = -1
+        self.lang_goal = total_lang
+        self.action_set = total_action
+        self.pose_set = total_pose
+        self.reward_set = total_reward
+        self.terminal_set = total_terminal
+        self.total_img = []
+        self.total_lang_emb = []
+        self.total_proprio = []
 
         self.mvt1 = MVTSingle(**args, renderer=self.renderer)
 
@@ -111,7 +128,7 @@ class MVT(nn.Module):
         wpt = self.mvt1.get_wpt(out, dyn_cam_info, y_q)
         return wpt
 
-    def render(self, pc, img_feat, img_aug, dyn_cam_info):
+    def render(self, pc, img_feat, img_aug, lang_emb, proprio_emb, dyn_cam_info):
         mvt = self.mvt1
 
         with torch.no_grad():
@@ -158,28 +175,13 @@ class MVT(nn.Module):
                 mvt.img = img[:, :, 3:].clone().detach()
             else:
                 mvt.img = img.clone().detach()
-            print(img.shape)
-            print(img[0][0][:3].shape)
+            # print(img.shape)
+            # print(img[0][0][:3].shape)
+            #
 
-            import torchvision.transforms as T
-            tmp1 = img[0][0][3:6]
-            tmp2 = img[0][1][3:6]
-            tmp3 = img[0][2][3:6]
-            tmp4 = img[0][3][3:6]
-            tmp5 = img[0][4][3:6]
-            # print(tmp[5][0])
-            transform = T.ToPILImage()
-            img1 = transform(tmp1) # over_rgb, keep the same
-            # img1.show()
-            img2 = transform(tmp2)
-            # img2.show()
-            img3 = transform(tmp3)
-            # img3.show()
-            img4 = transform(tmp4)
-            # img4.show()
-            img5 = transform(tmp5)
-            # img5.show()
-            save_virtual(img1, img2, img3, img4, img5, self.episode, self.task)
+
+
+
 
             # image augmentation
             if img_aug != 0:
@@ -195,6 +197,21 @@ class MVT(nn.Module):
                     (img, pixel_loc.unsqueeze(0).repeat(bs, 1, 1, 1, 1)), dim=2
                 )
 
+            if self.pre_episode != self.episode:
+                self.frame_num = 0
+                self.pre_episode = self.episode
+                self.total_img = []
+                self.total_lang_emb = []
+                self.total_proprio = []
+            else:
+                self.frame_num += 1
+                self.total_img.append(img[0, 0:5].cpu().numpy())
+                self.total_lang_emb.append(lang_emb[0].cpu().numpy())
+                self.total_proprio.append(proprio_emb[0].cpu().numpy())
+                if self.frame_num == len(self.terminal_set) - 1:
+                    save_virtual(self.total_img, self.episode, self.task, self.frame_num, self.total_lang_emb, self.total_proprio,
+                        self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set)
+                    import pdb;pdb.set_trace()
         return img
 
     def verify_inp(
@@ -266,12 +283,16 @@ class MVT(nn.Module):
             pc,
             img_feat,
             img_aug,
+            lang_emb,
+            proprio,
             dyn_cam_info=None,
         )
-        # print(img.shape)
-        # out = self.mvt1(img=img, proprio=proprio, lang_emb=lang_emb, **kwargs)
+        # print("222")
+        # print(proprio.shape)
+        # print(lang_emb.shape)
+        out = self.mvt1(img=img, proprio=proprio, lang_emb=lang_emb, **kwargs)
         # print(out.shape)
-        return 0
+        return out
 
     def free_mem(self):
         """

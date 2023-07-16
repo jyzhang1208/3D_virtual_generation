@@ -36,7 +36,7 @@ method:
   crop_augmentation: true
   final_dim: 64
   transform_augmentation:
-    apply_se3: true
+    apply_se3: false #true
     aug_xyz:
     - 0.125
     - 0.125
@@ -46,7 +46,7 @@ method:
     - 0.0
     - 0.0
     aug_rot_resolution: 5
-  demo_augmentation: true
+  demo_augmentation: false #true
   demo_augmentation_every_n: 10
   no_skip_connection: false
   no_perceiver: false

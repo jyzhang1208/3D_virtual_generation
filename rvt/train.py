@@ -231,7 +231,7 @@ def experiment(rank, cmd_args, devices, port):
         only_train=True,
         sample_distribution_mode=exp_cfg.sample_distribution_mode,
     )
-    train_dataset, _ = get_dataset_func()
+    train_dataset, _, _ = get_dataset_func()
     t_end = time.time()
     print("Created Dataset. Time Cost: {} minutes".format((t_end - t_start) / 60.0))
     print(train_dataset)

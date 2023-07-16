@@ -276,7 +276,7 @@ class RVTAgent:
         warmup_steps: int = 0,
         image_resolution: list = None,
         lambda_weight_l2: float = 0.0,
-        transform_augmentation: bool = True,
+        transform_augmentation: bool = False,
         transform_augmentation_xyz: list = [0.1, 0.1, 0.1],
         transform_augmentation_rpy: list = [0.0, 0.0, 20.0],
         place_with_mean: bool = True,

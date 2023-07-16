@@ -73,7 +73,7 @@ def train(agent, dataset, training_iterations, rank=0):
         tmp = batch['right_shoulder_rgb'][0][0] / 255.0
         # tmp[0], tmp[1], tmp[2] = tmp[2], tmp[1], tmp[0]
         # tmp = tmp.cpu().numpy()
-        print("333")
+        # print("333")
         transform = T.ToPILImage()
         img = transform(tmp)
         # img.show()
@@ -81,6 +81,12 @@ def train(agent, dataset, training_iterations, rank=0):
         # tmp = tmp.permute(1, 2, 0)
         # print(tmp[0])
         # print(tmp[0].shape)
+        # print("lang_goal", batch["lang_goal"])
+        # print("lang_goal_embs", batch["lang_goal_embs"].shape)
+        # print("action", batch["action"])
+        # print("gripper_pose_tp1", batch["gripper_pose_tp1"])
+        # print("reward", batch["reward"])
+        # import pdb;pdb.set_trace()
 
 
         update_args.update(
@@ -213,7 +219,7 @@ def experiment(rank, cmd_args, devices, port):
         only_train=True,
         sample_distribution_mode=exp_cfg.sample_distribution_mode,
     )
-    train_dataset, _, episode_idx = get_dataset_func()
+    train_dataset, _, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward = get_dataset_func()
     t_end = time.time()
     print("Created Dataset. Time Cost: {} minutes".format((t_end - t_start) / 60.0))
     print(train_dataset)
@@ -234,6 +240,11 @@ def experiment(rank, cmd_args, devices, port):
             renderer_device=device,
             task_name=tasks[0],
             episode_num=episode_idx,
+            total_lang = total_lang,
+            total_action = total_action,
+            total_pose = total_pose,
+            total_terminal = total_terminal,
+            total_reward = total_reward,
             **mvt_cfg,
         ).to(device) # multi-view transformer
         if ddp:

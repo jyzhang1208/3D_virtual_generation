@@ -88,13 +88,14 @@ def get_dataset(
                 print(f"remove {test_replay_storage_folder}")
 
         # print("----- Train Buffer -----")
-        episode_idx = fill_replay(
+        # change augment
+        episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward = fill_replay(
             replay=train_replay_buffer,
             task=task,
             task_replay_storage_folder=train_replay_storage_folder,
             start_idx=0,
             num_demos=NUM_TRAIN,
-            demo_augmentation=True,
+            demo_augmentation=False,
             demo_augmentation_every_n=DEMO_AUGMENTATION_EVERY_N,
             cameras=CAMERAS,
             rlbench_scene_bounds=SCENE_BOUNDS,
@@ -138,7 +139,7 @@ def get_dataset(
     # wrap buffer with PyTorch dataset and make iterator
     train_wrapped_replay = PyTorchReplayBuffer(
         train_replay_buffer,
-        sample_mode="random",
+        sample_mode="enumerate",
         num_workers=num_workers,
         sample_distribution_mode=sample_distribution_mode,
     )
@@ -153,4 +154,4 @@ def get_dataset(
             num_workers=num_workers,
         )
         test_dataset = test_wrapped_replay.dataset()
-    return train_dataset, test_dataset, episode_idx
+    return train_dataset, test_dataset, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward

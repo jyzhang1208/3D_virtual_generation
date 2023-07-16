@@ -235,6 +235,11 @@ def _add_keypoints_to_replay(
 ):
     prev_action = None
     obs = inital_obs
+    total_lang_goal = []
+    total_action = []
+    total_pose = []
+    total_terminal = []
+    total_reward = []
     for k in range(
         next_keypoint_idx, len(episode_keypoints)
     ):  # confused here, it seems that there are many similar samples in the replay
@@ -255,9 +260,14 @@ def _add_keypoints_to_replay(
             rotation_resolution,
             crop_augmentation,
         )
-
+        total_action.append(action)
+        total_pose.append(prev_action)
+        # print("action:", action)
         terminal = k == len(episode_keypoints) - 1
         reward = float(terminal) * 1.0 if terminal else 0
+        total_terminal.append(terminal)
+        total_reward.append(reward)
+
 
         obs_dict = extract_obs(
             obs,
@@ -286,12 +296,19 @@ def _add_keypoints_to_replay(
             "next_keypoint_frame": keypoint,
             "sample_frame": sample_frame,
         }
+
         final_obs = {
             "trans_action_indicies": trans_indicies,
             "rot_grip_action_indicies": rot_grip_indicies,
             "gripper_pose": obs_tp1.gripper_pose,
             "lang_goal": np.array([description], dtype=object),
         }
+        # print("trans_action_indicies", trans_indicies)
+        # print("rot_grip_action_indicies", rot_grip_indicies)
+        # print("gripper_pose", obs_tp1.gripper_pose)
+        # print("lang_goal", np.array([description]))
+        # import pdb;pdb.set_trace()
+        total_lang_goal.append(np.array([description], dtype=object))
 
         others.update(final_obs)
         others.update(obs_dict)
@@ -318,10 +335,17 @@ def _add_keypoints_to_replay(
         episode_length=25,
     )
     obs_dict_tp1["lang_goal_embs"] = lang_embs[0].float().detach().cpu().numpy()
+    # print("total_lang", total_lang_goal)
+    # print("total_terminal", total_terminal)
+    # print("total_reward", total_reward)
+    # import pdb;pdb.set_trace()
 
     obs_dict_tp1.pop("wrist_world_to_cam", None)
     obs_dict_tp1.update(final_obs)
+    # print()
     replay.add_final(task, task_replay_storage_folder, **obs_dict_tp1)
+
+    return total_lang_goal, total_action, total_pose, total_terminal, total_reward
 
 
 def fill_replay(
@@ -364,56 +388,61 @@ def fill_replay(
         print("Filling replay ...")
         for d_idx in range(start_idx, start_idx + num_demos):
             print("Filling demo %d" % d_idx)
-            demo = get_stored_demo(data_path=data_path, index=d_idx)
-            # print(demo)
+            if d_idx == 29:
+                demo = get_stored_demo(data_path=data_path, index=d_idx)
+                # print(demo)
 
-            # get language goal from disk
-            varation_descs_pkl_file = os.path.join(
-                data_path, episode_folder % d_idx, variation_desriptions_pkl
-            )
-            with open(varation_descs_pkl_file, "rb") as f:
-                descs = pickle.load(f)
-
-            # extract keypoints
-            episode_keypoints = keypoint_discovery(demo)
-            next_keypoint_idx = 0
-            for i in range(len(demo) - 1):
-                if not demo_augmentation and i > 0:
-                    break
-                if i % demo_augmentation_every_n != 0:  # choose only every n-th frame
-                    continue
-
-                obs = demo[i]
-                desc = descs[0]
-                # if our starting point is past one of the keypoints, then remove it
-                while (
-                    next_keypoint_idx < len(episode_keypoints)
-                    and i >= episode_keypoints[next_keypoint_idx]
-                ):
-                    next_keypoint_idx += 1
-                if next_keypoint_idx == len(episode_keypoints):
-                    break
-                _add_keypoints_to_replay(
-                    replay,
-                    task,
-                    task_replay_storage_folder,
-                    d_idx,
-                    i,
-                    obs,
-                    demo,
-                    episode_keypoints,
-                    cameras,
-                    rlbench_scene_bounds,
-                    voxel_sizes,
-                    rotation_resolution,
-                    crop_augmentation,
-                    next_keypoint_idx=next_keypoint_idx,
-                    description=desc,
-                    clip_model=clip_model,
-                    device=device,
+                # get language goal from disk
+                varation_descs_pkl_file = os.path.join(
+                    data_path, episode_folder % d_idx, variation_desriptions_pkl
                 )
+                with open(varation_descs_pkl_file, "rb") as f:
+                    descs = pickle.load(f)
 
-                return d_idx
+                # extract keypoints
+                episode_keypoints = keypoint_discovery(demo)
+                next_keypoint_idx = 0
+                for i in range(len(demo) - 1):
+                    if not demo_augmentation and i > 0:
+                        break
+                    if i % demo_augmentation_every_n != 0:  # choose only every n-th frame
+                        continue
+
+                    obs = demo[i]
+                    desc = descs[0]
+                    # if our starting point is past one of the keypoints, then remove it
+                    while (
+                        next_keypoint_idx < len(episode_keypoints)
+                        and i >= episode_keypoints[next_keypoint_idx]
+                    ):
+                        next_keypoint_idx += 1
+                    if next_keypoint_idx == len(episode_keypoints):
+                        break
+                    total_lang, total_action, total_pose, total_terminal, total_reward = _add_keypoints_to_replay(
+                        replay,
+                        task,
+                        task_replay_storage_folder,
+                        d_idx,
+                        i,
+                        obs,
+                        demo,
+                        episode_keypoints,
+                        cameras,
+                        rlbench_scene_bounds,
+                        voxel_sizes,
+                        rotation_resolution,
+                        crop_augmentation,
+                        next_keypoint_idx=next_keypoint_idx,
+                        description=desc,
+                        clip_model=clip_model,
+                        device=device,
+                    )
+                    # print("999")
+                    # print(replay)
+                    # import pdb;pdb.set_trace()
+
+                return d_idx, total_lang, total_action, total_pose, total_terminal, total_reward
+
 
         # save TERMINAL info in replay_info.npy
         task_idx = replay._task_index[task]
