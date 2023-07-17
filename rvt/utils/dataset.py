@@ -366,6 +366,7 @@ def fill_replay(
     variation_desriptions_pkl: str,
     clip_model=None,
     device="cpu",
+    save_episode=0,
 ):
 
     disk_exist = False
@@ -382,13 +383,13 @@ def fill_replay(
             logging.info("\t saving to disk: %s", task_replay_storage_folder)
             os.makedirs(task_replay_storage_folder, exist_ok=True)
 
-    if disk_exist:
+    if not disk_exist:
         replay.recover_from_disk(task, task_replay_storage_folder)
     else:
         print("Filling replay ...")
         for d_idx in range(start_idx, start_idx + num_demos):
             print("Filling demo %d" % d_idx)
-            if d_idx == 29:
+            if d_idx == save_episode:
                 demo = get_stored_demo(data_path=data_path, index=d_idx)
                 # print(demo)
 

@@ -95,6 +95,7 @@ class MVT(nn.Module):
         self.total_img = []
         self.total_lang_emb = []
         self.total_proprio = []
+        self.frame_list = []
 
         self.mvt1 = MVTSingle(**args, renderer=self.renderer)
 
@@ -203,14 +204,16 @@ class MVT(nn.Module):
                 self.total_img = []
                 self.total_lang_emb = []
                 self.total_proprio = []
+                self.frame_list = []
             else:
                 self.frame_num += 1
                 self.total_img.append(img[0, 0:5].cpu().numpy())
                 self.total_lang_emb.append(lang_emb[0].cpu().numpy())
                 self.total_proprio.append(proprio_emb[0].cpu().numpy())
+                self.frame_list.append(self.frame_num)
                 if self.frame_num == len(self.terminal_set) - 1:
                     save_virtual(self.total_img, self.episode, self.task, self.frame_num, self.total_lang_emb, self.total_proprio,
-                        self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set)
+                        self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set, self.frame_list)
                     import pdb;pdb.set_trace()
         return img
 

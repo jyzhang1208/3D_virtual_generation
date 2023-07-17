@@ -37,6 +37,7 @@ def get_dataset(
     num_workers,
     only_train,
     sample_distribution_mode="transition_uniform",
+    save_ep=0,
 ):
 
     train_replay_buffer = create_replay(
@@ -107,6 +108,7 @@ def get_dataset(
             variation_desriptions_pkl=VARIATION_DESCRIPTIONS_PKL,
             clip_model=clip_model,
             device=device,
+            save_episode=save_ep,
         )
 
         if not only_train:
@@ -129,6 +131,7 @@ def get_dataset(
                 variation_desriptions_pkl=VARIATION_DESCRIPTIONS_PKL,
                 clip_model=clip_model,
                 device=device,
+                save_episode=save_ep,
             )
 
     # delete the CLIP model since we have already extracted language features

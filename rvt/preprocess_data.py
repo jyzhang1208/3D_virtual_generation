@@ -168,6 +168,7 @@ def experiment(rank, cmd_args, devices, port):
     device = f"cuda:{device}"
     ddp = len(devices) > 1
     ddp_utils.setup(rank, world_size=len(devices), port=port)
+    save_episode = cmd_args.save_episode
 
     exp_cfg = exp_cfg_mod.get_cfg_defaults()
     if cmd_args.exp_cfg_path != "":
@@ -218,6 +219,7 @@ def experiment(rank, cmd_args, devices, port):
         num_workers=exp_cfg.num_workers,
         only_train=True,
         sample_distribution_mode=exp_cfg.sample_distribution_mode,
+        save_ep=save_episode,
     )
     train_dataset, _, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward = get_dataset_func()
     t_end = time.time()
@@ -323,6 +325,7 @@ if __name__ == "__main__":
     parser.add_argument("--exp_cfg_opts", type=str, default="")
 
     parser.add_argument("--log-dir", type=str, default="runs")
+    parser.add_argument("--save_episode", type=int, default=0)
     parser.add_argument("--with-eval", action="store_true", default=False)
 
     cmd_args = parser.parse_args()
