@@ -86,15 +86,15 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
         "task_name": task,
         "episode": episode_num,
         "timesteps": frame_list,
-        "virtual_images": np.array(virtual_images),
+        "imgs": np.array(virtual_images),
         "lang_emb_77": np.array(lang_embedding),
         "lang_emb": np.array(lang_new),
         "proprio": np.array(proprio_feat),
         "lang_goal": lang_target,
-        "action_set": np.array(action_set),
-        "pose_set": np.array(pose_set),
-        "terminal_set": terminal_set,
-        "reward_set": reward_set,
+        "actions": np.array(action_set),
+        "poses": np.array(pose_set),
+        "terminals": terminal_set,
+        "rewards": reward_set,
 
     }
     # print(save_dict)
@@ -112,7 +112,7 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
     data = pickle.load(temp)
     if terminal_set[frame_num] == True:
         # import numpy as np
-        print("img", np.array(data['virtual_images']).shape)
+        # print("img", np.array(data['virtual_images']).shape)
         print("lang_emb", np.array(data['lang_emb']).shape)
         print("proprio", np.array(data['proprio']).shape)
 

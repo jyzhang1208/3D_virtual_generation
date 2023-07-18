@@ -383,9 +383,9 @@ def fill_replay(
             logging.info("\t saving to disk: %s", task_replay_storage_folder)
             os.makedirs(task_replay_storage_folder, exist_ok=True)
 
-    if not disk_exist:
-        replay.recover_from_disk(task, task_replay_storage_folder)
-    else:
+    # if disk_exist:
+    #     replay.recover_from_disk(task, task_replay_storage_folder)
+    if True:
         print("Filling replay ...")
         for d_idx in range(start_idx, start_idx + num_demos):
             print("Filling demo %d" % d_idx)
