@@ -246,6 +246,7 @@ def _add_keypoints_to_replay(
         keypoint = episode_keypoints[k]
         obs_tp1 = demo[keypoint]
         obs_tm1 = demo[max(0, keypoint - 1)]
+        # print("obs_tp1", obs_tp1)
         (
             trans_indicies,
             rot_grip_indicies,

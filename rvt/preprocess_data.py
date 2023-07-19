@@ -37,12 +37,13 @@ from rvt.utils.peract_utils import (
     IMAGE_SIZE,
     DATA_FOLDER,
 )
+from save_rgb_base import save_rgb
 from PIL import Image
 import cv2
 
 
 # new train takes the dataset as input
-def train(agent, dataset, training_iterations, rank=0):
+def train(agent, dataset, training_iterations, rank=0, base_rgb=0):
     agent.train()
     log = defaultdict(list)
 
@@ -70,12 +71,33 @@ def train(agent, dataset, training_iterations, rank=0):
 
         # print(raw_batch['right_shoulder_rgb'].shape)
         # print(raw_batch['right_shoulder_rgb'][0][0][1][2])
-        tmp = batch['right_shoulder_rgb'][0][0] / 255.0
+        right_shoulder_rgb = batch['right_shoulder_rgb'].permute(0, 1, 3, 4, 2).cpu().numpy()
+        front_rgb = batch['front_rgb'].permute(0, 1, 3, 4, 2).cpu().numpy()
+        left_shoulder_rgb = batch['left_shoulder_rgb'].permute(0, 1, 3, 4, 2).cpu().numpy()
+        wrist_rgb = batch['wrist_rgb'].permute(0, 1, 3, 4, 2).cpu().numpy()
+        terminal = batch['terminal'].cpu().numpy()
+        # print("right_shoulder_rgb", right_shoulder_rgb[0].shape)
+        # print("tasks", batch['tasks'])
+        right_shoulder_rgb = list(right_shoulder_rgb[0][0])
+        front_rgb = list(front_rgb[0][0])
+        left_shoulder_rgb = list(left_shoulder_rgb[0][0])
+        wrist_rgb = list(wrist_rgb[0][0])
+        base_rgb.append([right_shoulder_rgb, front_rgb, left_shoulder_rgb, wrist_rgb])
+        # base_rgb.append(front_rgb)
+        # base_rgb.append(left_shoulder_rgb)
+        # base_rgb.append(wrist_rgb)
+        # base_rbg = [base_rgb]
+        # import numpy as np
+        # print(np.array(base_rgb).shape)
+        if terminal[0] == 1:
+            save_rgb(base_rgb, batch['tasks'], batch['episode_idx'])
+
+        # import pdb;pdb.set_trace()
         # tmp[0], tmp[1], tmp[2] = tmp[2], tmp[1], tmp[0]
         # tmp = tmp.cpu().numpy()
         # print("333")
-        transform = T.ToPILImage()
-        img = transform(tmp)
+        # transform = T.ToPILImage()
+        # img = transform(tmp)
         # img.show()
         # print(tmp)
         # tmp = tmp.permute(1, 2, 0)
@@ -225,6 +247,7 @@ def experiment(rank, cmd_args, devices, port):
     t_end = time.time()
     print("Created Dataset. Time Cost: {} minutes".format((t_end - t_start) / 60.0))
     print(train_dataset)
+    base_rgb = []
 
     if exp_cfg.agent == "our":
         mvt_cfg = mvt_cfg_mod.get_cfg_defaults()
@@ -296,7 +319,7 @@ def experiment(rank, cmd_args, devices, port):
             break
 
         print(f"Rank [{rank}], Epoch [{i}]: Training on train dataset")
-        out = train(agent, train_dataset, TRAINING_ITERATIONS, rank)
+        out = train(agent, train_dataset, TRAINING_ITERATIONS, rank, base_rgb)
 
         if rank == 0:
             tb.update("train", i, out)

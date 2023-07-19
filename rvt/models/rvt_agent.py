@@ -1,7 +1,7 @@
 # Copyright (c) 2022-2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 # Licensed under the NVIDIA Source Code License [see LICENSE for details].
-
+import pdb
 import pprint
 
 import torch
@@ -509,6 +509,9 @@ class RVTAgent:
                 obs,
                 pcd,
             )
+            # print("obs_len", len(obs))
+            # print("obs", obs.numpy().shape)
+            # import pdb;pdb.set_trace()
 
             if self._transform_augmentation and backprop:
                 action_trans_con, action_rot, pc = apply_se3_aug_con(

@@ -9,6 +9,7 @@ from transformers import (
     CLIPTextModel,
     CLIPModel,
 )
+from PIL import Image
 FOLDER_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess"
 EPISODE_FOLDER = 'episode%d'
 # keypoint_num = 0
@@ -26,6 +27,33 @@ def get_lang_token(lang_encoder, lang_tokenizer, lang_goal, device):
     prompt = output.pooler_output[None, :, :]  # [1, 512]
     prompt = prompt.detach().to(device=device)
     return prompt
+
+def get_r3m_features(img_step, model):
+    import torchvision.transforms as T
+
+    ## DEFINE PREPROCESSING
+    transforms = T.Compose(
+        [T.Resize(256), T.CenterCrop(224), T.ToTensor()]
+    )  # ToTensor() divides by 255
+
+    if torch.cuda.is_available():
+        device = "cuda"
+    else:
+        device = "cpu"
+    img_step_features = []
+    for img in img_step:
+        preprocessed_image = transforms(Image.fromarray(img.astype(np.uint8))).reshape(
+            -1, 3, 224, 224
+        )
+        preprocessed_image.to(device)
+        with torch.no_grad():
+            embedding = (
+                model(preprocessed_image * 255.0).detach().cpu().numpy()
+            )  ## R3M expects image input to be [0-255]
+            # print(embedding.shape) # [1, 2048]
+            img_step_features.append(embedding)
+    img_step_features = np.concatenate(img_step_features, axis=1).squeeze()
+    return img_step_features
 
 def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal, action_set, pose_set, terminal_set, reward_set, frame_list):
     TASK_NAME = task
@@ -79,6 +107,7 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
     lang_encoder, lang_tokenizer = load_lang_encoders()
     lang_temp = get_lang_token(lang_encoder, lang_tokenizer, lang_target, 'cuda:0')
     lang_new = list(lang_temp[0].cpu().numpy())
+
 
     # print(lang_temp.shape)
 
