@@ -7,7 +7,7 @@ from yacs.config import CfgNode as CN
 _C = CN()
 
 _C.depth = 8
-_C.img_size = 110
+_C.img_size = 220
 _C.add_proprio = True
 _C.proprio_dim = 4
 _C.add_lang = True

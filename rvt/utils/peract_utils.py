@@ -52,7 +52,7 @@ def _preprocess_inputs(replay_sample, cameras):
         rgb = _norm_rgb(rgb)
         rgb_tmp = rgb.cpu().numpy()
         pcd_tmp = pcd.cpu().numpy()
-        # print(rgb_tmp.shape)
+        # print(pcd_tmp.shape)
         # import pdb;pdb.set_trace()
         # pic = Image.fromarray(rgb_tmp[1].reshape(128,128,3),"RGB")
         # pic.show()

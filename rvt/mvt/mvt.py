@@ -13,7 +13,7 @@ import numpy as np
 from mvt.mvt_single import MVT as MVTSingle
 from mvt.config import get_cfg_defaults
 from mvt.renderer import BoxRenderer
-from mvt.save_virtual_image import save_virtual
+from mvt.save_virtual_image import save_virtual, save_virtual_add_eval
 
 
 class MVT(nn.Module):
@@ -212,8 +212,8 @@ class MVT(nn.Module):
                 self.total_proprio.append(proprio_emb[0].cpu().numpy())
                 self.frame_list.append(self.frame_num)
                 if self.frame_num == len(self.terminal_set) - 1:
-                    # save_virtual(self.total_img, self.episode, self.task, self.frame_num, self.total_lang_emb, self.total_proprio,
-                    #     self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set, self.frame_list)
+                    save_virtual(self.total_img, self.episode, self.task, self.frame_num, self.total_lang_emb, self.total_proprio,
+                        self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set, self.frame_list)
                     import pdb;pdb.set_trace()
         return img
 

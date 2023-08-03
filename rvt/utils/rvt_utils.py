@@ -255,13 +255,19 @@ RLBENCH_TASKS = [
     # "open_drawer",
     # "put_groceries_in_cupboard",
     # "place_shape_in_shape_sorter",
-    "push_buttons",
+    # "push_buttons",
     # "close_jar",
     # "place_wine_at_rack_location",
     # "light_bulb_in",
     # "insert_onto_square_peg",
     # "meat_off_grill",
     # "stack_cups",
+    # "put_item_in_drawer",
+    "turn_tap",
+    # "sweep_to_dustpan_of_size",
+    # "put_money_in_safe",
+    # "stack_blocks",
+    # "place_cups",
 ]
 
 def load_agent(agent_path, agent=None, only_epoch=False):

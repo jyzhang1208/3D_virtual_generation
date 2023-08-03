@@ -89,8 +89,8 @@ def train(agent, dataset, training_iterations, rank=0, base_rgb=0):
         # base_rbg = [base_rgb]
         # import numpy as np
         # print(np.array(base_rgb).shape)
-        if terminal[0] == 1:
-            save_rgb(base_rgb, batch['tasks'], batch['episode_idx'])
+        # if terminal[0] == 1:
+        #     save_rgb(base_rgb, batch['tasks'], batch['episode_idx'])
 
         # import pdb;pdb.set_trace()
         # tmp[0], tmp[1], tmp[2] = tmp[2], tmp[1], tmp[0]

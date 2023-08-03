@@ -26,6 +26,7 @@ from rlbench.demo import Demo
 from rvt.utils.peract_utils import LOW_DIM_SIZE, IMAGE_SIZE, CAMERAS
 from rvt.libs.peract.helpers.demo_loading_utils import keypoint_discovery
 from rvt.libs.peract.helpers.utils import extract_obs
+from rvt.utils.load_variation import save_variation
 
 
 def create_replay(
@@ -411,6 +412,7 @@ def fill_replay(
                         continue
 
                     obs = demo[i]
+                    # print(demo.variation_number)
                     desc = descs[0]
                     # if our starting point is past one of the keypoints, then remove it
                     while (
@@ -442,6 +444,8 @@ def fill_replay(
                     # print("999")
                     # print(replay)
                     # import pdb;pdb.set_trace()
+                    # if save_episode != 80:
+                    #     save_variation(demo.variation_number, total_lang, task)
 
                 return d_idx, total_lang, total_action, total_pose, total_terminal, total_reward
 
