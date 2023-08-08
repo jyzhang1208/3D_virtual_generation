@@ -174,7 +174,9 @@ def _get_action(
     attention_coordinate = obs_tp1.gripper_pose[:3]
     trans_indicies, attention_coordinates = [], []
     bounds = np.array(rlbench_scene_bounds)
-    ignore_collisions = int(obs_tm1.ignore_collisions)
+    # ignore_collisions = int(obs_tm1.ignore_collisions) # change
+    ignore_collisions = 0
+    # obs_tm1.ignore_collisions = 0
     for depth, vox_size in enumerate(
         voxel_sizes
     ):  # only single voxelization-level is used in PerAct
@@ -190,7 +192,7 @@ def _get_action(
     return (
         trans_indicies,
         rot_and_grip_indicies,
-        ignore_collisions,
+        ignore_collisions, # change
         np.concatenate([obs_tp1.gripper_pose, np.array([grip])]),
         attention_coordinates,
     )
@@ -445,7 +447,9 @@ def fill_replay(
                     # print(replay)
                     # import pdb;pdb.set_trace()
                     # if save_episode != 80:
-                    #     save_variation(demo.variation_number, total_lang, task)
+                    # save_variation(demo.variation_number, total_lang, task)
+                    # import pdb;
+                    # pdb.set_trace()
 
                 return d_idx, total_lang, total_action, total_pose, total_terminal, total_reward
 

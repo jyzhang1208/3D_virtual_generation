@@ -1,4 +1,4 @@
-for i in {0..99}; do
+for i in {0..124}; do
     echo $i
     python preprocess_data.py --exp_cfg_path=configs/all.yaml \
                         --device=0 \

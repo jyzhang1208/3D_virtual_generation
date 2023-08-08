@@ -216,7 +216,7 @@ def experiment(rank, cmd_args, devices, port):
 
     # Things to change
     BATCH_SIZE_TRAIN = exp_cfg.bs
-    NUM_TRAIN = 100
+    NUM_TRAIN = 125
     # to match peract, iterations per epoch
     TRAINING_ITERATIONS = int(10000 // (exp_cfg.bs * len(devices) / 16))
     EPOCHS = exp_cfg.epochs

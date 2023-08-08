@@ -12,32 +12,36 @@ from transformers import (
 from PIL import Image
 SAVE_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/processed_baseline_eval/"
 DATA_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess/"
+FORMER_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/train/take_lid_off_saucepan/all_variations/episodes/episode0"
+FORMER2_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/train/reach_and_drag/all_variations/episodes/episode0"
 EPISODE_FOLDER = 'episode%d'
 
 RLBENCH_TASKS = [
     # "reach_and_drag",
+    # "reach_target",
     # "slide_block_to_color_target",
     # "open_drawer",
     # "put_groceries_in_cupboard",
     # "place_shape_in_shape_sorter",
     # "push_buttons",
     # "close_jar",
-    "place_wine_at_rack_location",
+    # "place_wine_at_rack_location",
     # "light_bulb_in",
     # "insert_onto_square_peg",
     # "meat_off_grill",
-    "stack_cups",
-    "put_item_in_drawer",
-    "turn_tap",
-    "sweep_to_dustpan_of_size",
-    "put_money_in_safe",
-    "stack_blocks",
-    "place_cups",
+    # "stack_cups",
+    # "put_item_in_drawer",
+    # "turn_tap",
+    # "sweep_to_dustpan_of_size",
+    # "put_money_in_safe",
+    # "stack_blocks",
+    # "place_cups",
 ]
 
 for task in RLBENCH_TASKS:
     print(task)
-    f = open(SAVE_PATH + task + '_all.pkl', 'rb')
+    # f = open(FORMER_PATH + task + '_all.pkl', 'rb')
+    f = open(FORMER_PATH + '/variation_descriptions.pkl', 'rb')
     data = pickle.load(f)
     import pdb;pdb.set_trace()
     for i in range(len(data)):

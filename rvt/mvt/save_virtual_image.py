@@ -10,9 +10,9 @@ from transformers import (
     CLIPModel,
 )
 from PIL import Image
-FOLDER_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess220"
+FOLDER_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess_new"
 EPISODE_FOLDER = 'episode%d'
-DATA_PATH="/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess220/"
+DATA_PATH="/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess_new/"
 SAVE_PATH="/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/processed_data_eval/"
 # keypoint_num = 0
 
@@ -69,7 +69,7 @@ def save_virtual_add_eval(img, episode_num, task, frame_num, lang_emb, proprio, 
     virtual_images = list(img)
     lang_embedding = list(lang_emb)
     proprio_feat = list(proprio)
-    pose_set[0] = pose_set[1] * 0
+    # pose_set[0] = pose_set[1] * 0
     for i in range(len(action_set)):
         action_set[i] = list(action_set[i])
         pose_set[i] = list(pose_set[i])
@@ -148,7 +148,9 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
     virtual_images = list(img)
     lang_embedding = list(lang_emb)
     proprio_feat = list(proprio)
-    pose_set[0] = pose_set[1] * 0
+    # pose_set[0] = pose_set[1] * 0
+    pose_set[0] = [2.78476566e-01, -8.16252083e-03, 1.47195959e+00, 2.96202711e-06,
+                   9.92665350e-01, -1.05953472e-06, 1.20895214e-01, 1.00000000e+00]
     for i in range(len(action_set)):
         action_set[i] = list(action_set[i])
         pose_set[i] = list(pose_set[i])
