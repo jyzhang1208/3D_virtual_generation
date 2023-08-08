@@ -285,8 +285,8 @@ RLBENCH_TASKS = [
     # "place_hanger_on_rack",
     # "lamp_on",
     # "lamp_off",
-    "take_money_out_safe",
-    # "reach_and_drag",
+    # "take_money_out_safe",
+    "reach_and_drag",
     # "pick_up_cup",
     # "pick_and_lift",
 ]

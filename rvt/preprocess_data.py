@@ -29,7 +29,7 @@ from rvt.utils.rvt_utils import (
     short_name,
     get_num_feat,
     load_agent,
-    RLBENCH_TASKS,
+    # RLBENCH_TASKS,
 )
 from rvt.utils.peract_utils import (
     CAMERAS,
@@ -148,7 +148,7 @@ def save_agent(agent, path, epoch):
     )
 
 
-def get_tasks(exp_cfg):
+def get_tasks(exp_cfg, RLBENCH_TASKS):
     parsed_tasks = exp_cfg.tasks.split(",")
     if parsed_tasks[0] == "all":
         tasks = RLBENCH_TASKS
@@ -191,6 +191,7 @@ def experiment(rank, cmd_args, devices, port):
     ddp = len(devices) > 1
     ddp_utils.setup(rank, world_size=len(devices), port=port)
     save_episode = cmd_args.save_episode
+    RLBENCH_TASKS = [cmd_args.task_name]
 
     exp_cfg = exp_cfg_mod.get_cfg_defaults()
     if cmd_args.exp_cfg_path != "":
@@ -223,7 +224,7 @@ def experiment(rank, cmd_args, devices, port):
     TRAIN_REPLAY_STORAGE_DIR = "replay/replay_train"
     TEST_REPLAY_STORAGE_DIR = "replay/replay_val"
     log_dir = get_logdir(cmd_args, exp_cfg)
-    tasks = get_tasks(exp_cfg)
+    tasks = get_tasks(exp_cfg, RLBENCH_TASKS)
     print("Training on {} tasks: {}".format(len(tasks), tasks))
 
     t_start = time.time()
@@ -350,6 +351,7 @@ if __name__ == "__main__":
     parser.add_argument("--log-dir", type=str, default="runs")
     parser.add_argument("--save_episode", type=int, default=0)
     parser.add_argument("--with-eval", action="store_true", default=False)
+    parser.add_argument("--task_name", type=str, default="reach_target")
 
     cmd_args = parser.parse_args()
     del (
