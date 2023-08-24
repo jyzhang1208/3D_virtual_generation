@@ -40,14 +40,18 @@ RLBENCH_TASKS = [
     # "insert_onto_square_peg",
     # "put_money_in_safe",
     # "close_jar",
-    "meat_off_grill",
-    "lamp_on",
-    "lamp_off",
-    "take_money_out_safe",
-    "reach_and_drag",
-    "pick_up_cup",
-    "pick_and_lift",
-
+    # "meat_off_grill",
+    # "lamp_on",
+    # "lamp_off",
+    # "take_money_out_safe",
+    # "reach_and_drag",
+    # "pick_up_cup",
+    # "pick_and_lift",
+    "wipe_desk",
+    "take_umbrella_out_of_umbrella_stand",
+    "put_books_on_bookshelf",
+    "basketball_in_hoop",
+    "push_button",
 ]
 
 for task in RLBENCH_TASKS:

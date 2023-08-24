@@ -280,10 +280,15 @@ def _add_keypoints_to_replay(
             prev_action=prev_action,
             episode_length=25,
         )
+
+        # obs_dict["lang_goal_embs"] = []
+        # for sub_descript in description:
         tokens = clip.tokenize([description]).numpy()
         token_tensor = torch.from_numpy(tokens).to(device)
         with torch.no_grad():
             lang_feats, lang_embs = _clip_encode_text(clip_model, token_tensor)
+        #     lang_emb_77 = lang_embs[0].float().detach().cpu().numpy()
+        # obs_dict["lang_goal_embs"].append(lang_emb_77)
         obs_dict["lang_goal_embs"] = lang_embs[0].float().detach().cpu().numpy()
 
         prev_action = np.copy(action)
@@ -318,6 +323,7 @@ def _add_keypoints_to_replay(
         others.update(obs_dict)
 
         timeout = False
+
         replay.add(
             task,
             task_replay_storage_folder,
@@ -339,6 +345,7 @@ def _add_keypoints_to_replay(
         episode_length=25,
     )
     obs_dict_tp1["lang_goal_embs"] = lang_embs[0].float().detach().cpu().numpy()
+    # obs_dict_tp1["lang_goal_embs"] = obs_dict["lang_goal_embs"]
     # print("total_lang", total_lang_goal)
     # print("total_terminal", total_terminal)
     # print("total_reward", total_reward)
@@ -415,7 +422,8 @@ def fill_replay(
 
                     obs = demo[i]
                     # print(demo.variation_number)
-                    desc = descs[0]
+                    desc = descs[0] # change
+                    # desc = descs
                     # if our starting point is past one of the keypoints, then remove it
                     while (
                         next_keypoint_idx < len(episode_keypoints)
@@ -447,9 +455,9 @@ def fill_replay(
                     # print(replay)
                     # import pdb;pdb.set_trace()
                     # if save_episode != 80:
-                    # save_variation(demo.variation_number, total_lang, task)
-                    # import pdb;
-                    # pdb.set_trace()
+                    save_variation(demo.variation_number, total_lang, task)
+                    import pdb;
+                    pdb.set_trace()
 
                 return d_idx, total_lang, total_action, total_pose, total_terminal, total_reward
 
