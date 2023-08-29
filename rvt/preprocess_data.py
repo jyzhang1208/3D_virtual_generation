@@ -217,7 +217,7 @@ def experiment(rank, cmd_args, devices, port):
 
     # Things to change
     BATCH_SIZE_TRAIN = exp_cfg.bs
-    NUM_TRAIN = 125
+    NUM_TRAIN = cmd_args.num_train
     # to match peract, iterations per epoch
     TRAINING_ITERATIONS = int(10000 // (exp_cfg.bs * len(devices) / 16))
     EPOCHS = exp_cfg.epochs
@@ -353,6 +353,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_episode", type=int, default=0)
     parser.add_argument("--with-eval", action="store_true", default=False)
     parser.add_argument("--task_name", type=str, default="reach_target")
+    parser.add_argument("--num_train", type=int, default=125)
 
     cmd_args = parser.parse_args()
     del (

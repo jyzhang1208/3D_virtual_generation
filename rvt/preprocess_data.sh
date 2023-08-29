@@ -9,6 +9,7 @@ for task in $TASK_LIST; do
         python preprocess_data.py --exp_cfg_path configs/all.yaml \
                             --device 0 \
                             --save_episode $i \
-                            --task_name $task
+                            --task_name $task \
+                            --num_train 125
     done
 done
