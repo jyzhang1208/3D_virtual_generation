@@ -455,11 +455,12 @@ def fill_replay(
                     # print(replay)
                     # import pdb;pdb.set_trace()
                     # if save_episode != 80:
-                    save_variation(demo.variation_number, total_lang, task)
-                    import pdb;
-                    pdb.set_trace()
+                    # save_variation(demo.variation_number, total_lang, task)
+                    variation = demo.variation_number
+                    # import pdb;
+                    # pdb.set_trace()
 
-                return d_idx, total_lang, total_action, total_pose, total_terminal, total_reward
+                return d_idx, total_lang, total_action, total_pose, total_terminal, total_reward, variation
 
 
         # save TERMINAL info in replay_info.npy

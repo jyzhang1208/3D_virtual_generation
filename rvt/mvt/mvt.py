@@ -49,8 +49,9 @@ class MVT(nn.Module):
         total_lang = "open",
         total_action = None,
         total_pose = None,
-        total_terminal=None,
-        total_reward=None,
+        total_terminal = None,
+        total_reward = None,
+        variation = 0,
     ):
         """MultiView Transfomer"""
         super().__init__()
@@ -92,6 +93,7 @@ class MVT(nn.Module):
         self.pose_set = total_pose
         self.reward_set = total_reward
         self.terminal_set = total_terminal
+        self.variation = variation
         self.total_img = []
         self.total_lang_emb = []
         self.total_proprio = []
@@ -215,8 +217,8 @@ class MVT(nn.Module):
                 self.total_proprio.append(proprio_emb[0].cpu().numpy())
                 self.frame_list.append(self.frame_num)
                 if self.frame_num == len(self.terminal_set) - 1:
-                    # save_virtual(self.total_img, self.episode, self.task, self.frame_num, self.total_lang_emb, self.total_proprio,
-                    #     self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set, self.frame_list)
+                    save_virtual(self.total_img, self.episode, self.task, self.frame_num, self.total_lang_emb, self.total_proprio,
+                        self.lang_goal, self.action_set, self.pose_set, self.terminal_set, self.reward_set, self.frame_list, self.variation)
                     import pdb;pdb.set_trace()
         return img
 

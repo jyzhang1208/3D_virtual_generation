@@ -244,7 +244,7 @@ def experiment(rank, cmd_args, devices, port):
         sample_distribution_mode=exp_cfg.sample_distribution_mode,
         save_ep=save_episode,
     )
-    train_dataset, _, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward = get_dataset_func()
+    train_dataset, _, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward, variation = get_dataset_func()
     t_end = time.time()
     print("Created Dataset. Time Cost: {} minutes".format((t_end - t_start) / 60.0))
     print(train_dataset)
@@ -271,6 +271,7 @@ def experiment(rank, cmd_args, devices, port):
             total_pose = total_pose,
             total_terminal = total_terminal,
             total_reward = total_reward,
+            variation = variation,
             **mvt_cfg,
         ).to(device) # multi-view transformer
         if ddp:

@@ -58,6 +58,7 @@ class MVT(nn.Module):
         total_pose=None,
         total_terminal=None,
         total_reward=None,
+        variation = 0,
 
     ):
         """MultiView Transfomer
@@ -118,6 +119,7 @@ class MVT(nn.Module):
         self.pose_set = total_pose
         self.reward_set = total_reward
         self.terminal_set = total_terminal
+        self.variation = variation
 
 
         print(f"MVT Vars: {vars(self)}")

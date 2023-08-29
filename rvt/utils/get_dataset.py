@@ -90,7 +90,7 @@ def get_dataset(
 
         # print("----- Train Buffer -----")
         # change augment
-        episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward = fill_replay(
+        episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward, variation = fill_replay(
             replay=train_replay_buffer,
             task=task,
             task_replay_storage_folder=train_replay_storage_folder,
@@ -157,4 +157,4 @@ def get_dataset(
             num_workers=num_workers,
         )
         test_dataset = test_wrapped_replay.dataset()
-    return train_dataset, test_dataset, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward
+    return train_dataset, test_dataset, episode_idx, total_lang, total_action, total_pose, total_terminal, total_reward, variation

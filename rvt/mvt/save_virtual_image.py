@@ -1,5 +1,6 @@
 import os
 import pickle
+import clip
 
 import torch
 import numpy as np
@@ -14,6 +15,7 @@ FOLDER_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/d
 EPISODE_FOLDER = 'episode%d'
 DATA_PATH="/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/preprocess_new/"
 SAVE_PATH="/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/processed_data_eval/"
+FORMER_PATH = "/media/zjy/e3a9400e-e022-4ed0-b57e-2a86d6ee8488/zjy/RVT/RVT/rvt/data/train/"
 # keypoint_num = 0
 
 def load_lang_encoders():
@@ -56,6 +58,22 @@ def get_r3m_features(img_step, model):
             img_step_features.append(embedding)
     img_step_features = np.concatenate(img_step_features, axis=1).squeeze()
     return img_step_features
+
+def _clip_encode_text(clip_model, text):
+    x = clip_model.token_embedding(text).type(
+        clip_model.dtype
+    )  # [batch_size, n_ctx, d_model]
+
+    x = x + clip_model.positional_embedding.type(clip_model.dtype)
+    x = x.permute(1, 0, 2)  # NLD -> LND
+    x = clip_model.transformer(x)
+    x = x.permute(1, 0, 2)  # LND -> NLD
+    x = clip_model.ln_final(x).type(clip_model.dtype)
+
+    emb = x.clone()
+    x = x[torch.arange(x.shape[0]), text.argmax(dim=-1)] @ clip_model.text_projection
+
+    return x, emb
 
 def save_virtual_add_eval(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal, action_set, pose_set, terminal_set, reward_set, frame_list):
     if episode_num == 0:
@@ -113,7 +131,7 @@ def save_virtual_add_eval(img, episode_num, task, frame_num, lang_emb, proprio, 
 
 
 
-def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal, action_set, pose_set, terminal_set, reward_set, frame_list):
+def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal, action_set, pose_set, terminal_set, reward_set, frame_list, variation):
     TASK_NAME = task
     num = episode_num
     """
@@ -164,9 +182,39 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
     # print("terminal_set", terminal_set)
     # print("cccccc", reward_set)
     # print("length", len(terminal_set))
+
+    f = open(FORMER_PATH + task + '/all_variations/episodes/' + f'episode{episode_num}' + '/variation_descriptions.pkl', 'rb')
+    desc_data = pickle.load(f)
+
+    try:
+        clip_model, _ = clip.load("RN50", device="cpu")  # CLIP-ResNet50
+        clip_model = clip_model.to("cpu")
+        clip_model.eval()
+    except RuntimeError:
+        print("WARNING: Setting Clip to None. Will not work if replay not on disk.")
+        clip_model = None
+
+    lang_total = []
+    new_feat = []
+    origin_lang_feat = []
     lang_encoder, lang_tokenizer = load_lang_encoders()
-    lang_temp = get_lang_token(lang_encoder, lang_tokenizer, lang_target, 'cuda:0')
-    lang_new = list(lang_temp[0].cpu().numpy())
+    for sub_descript in desc_data:
+        lang_temp = get_lang_token(lang_encoder, lang_tokenizer, sub_descript, 'cuda:0')
+        lang_origin = lang_temp[0].cpu().numpy()
+        origin_lang_feat.append(lang_origin[0])
+        tokens = clip.tokenize([sub_descript]).numpy()
+        token_tensor = torch.from_numpy(tokens).to("cpu")
+        with torch.no_grad():
+            lang_feats, lang_embs = _clip_encode_text(clip_model, token_tensor)
+        lang_emb_77 = lang_embs[0].float().detach().cpu().numpy()
+        lang_feat_add = lang_feats[0].float().detach().cpu().numpy()
+        # import pdb;pdb.set_trace()
+        lang_total.append(lang_emb_77)
+        new_feat.append(lang_feat_add)
+
+    # lang_encoder, lang_tokenizer = load_lang_encoders()
+    # lang_temp = get_lang_token(lang_encoder, lang_tokenizer, lang_target, 'cuda:0')
+    # lang_new = list(lang_temp[0].cpu().numpy())
     pose_set[0] = [2.78476566e-01, -8.16252083e-03, 1.47195959e+00, 2.96202711e-06,
                    9.92665350e-01, -1.05953472e-06, 1.20895214e-01, 1.00000000e+00]
 
@@ -178,14 +226,16 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
         "episode": episode_num,
         "timesteps": frame_list,
         "imgs": np.array(virtual_images),
-        "lang_emb_77": np.array(lang_embedding),
-        "lang_emb": np.array(lang_new),
+        "lang_emb_77": np.array(lang_total),
+        "lang_emb": np.array(origin_lang_feat),
+        "new_lang_feat": np.array(new_feat),
         "proprio": np.array(proprio_feat),
-        "lang_goal": lang_target,
+        "lang_goal": desc_data,
         "actions": np.array(action_set),
         "poses": np.array(pose_set),
         "terminals": terminal_set,
         "rewards": reward_set,
+        "variation": variation,
 
     }
     # print(save_dict)
@@ -206,6 +256,24 @@ def save_virtual(img, episode_num, task, frame_num, lang_emb, proprio, lang_goal
         # print("img", np.array(data['virtual_images']).shape)
         print("lang_emb", np.array(data['lang_emb']).shape)
         print("proprio", np.array(data['proprio']).shape)
+
+    data_path = DATA_PATH + f"{task}_all"
+    save_all_path = DATA_PATH + f"{task}_all.pkl"
+    ff = open(data_path + '/ep' + str(episode_num) + '.pkl', 'rb')
+
+    ep_data = pickle.load(ff)
+    if episode_num == 0:
+        total_data = []
+        total_data.append(ep_data)
+    else:
+        fff = open(save_all_path, 'rb')
+        total_data = pickle.load(fff)
+        total_data.append(ep_data)
+
+    with open(save_all_path, "wb") as f2:
+        pickle.dump(total_data, f2)
+
+
 
     """
     # print("111")
